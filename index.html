@@ -18,6 +18,21 @@
       align-items: center;
       text-align: center;
     }
+    h1.title {
+      font-size: 4em;
+      color: #0f0;
+      text-shadow: 0 0 20px #0f0;
+      margin-bottom: 10px;
+    }
+    .ip-address, .isp-name {
+      font-size: 1.2em;
+      color: #aaa;
+    }
+    .ipv6-address {
+      font-size: 1.1em;
+      color: #888;
+      margin-bottom: 20px;
+    }
     #main-speed {
       font-size: 6em;
       margin-bottom: 0;
@@ -71,6 +86,10 @@
   </style>
 </head>
 <body>
+  <h1 class="title">SpeedTest</h1>
+  <div class="ip-address" id="ip-address">Fetching IPv4...</div>
+  <div class="isp-name" id="isp-name"></div>
+  <div class="ipv6-address" id="ipv6-address"></div>
   <div class="meter" id="main-speed">--</div>
   <div class="unit-label">Mbps</div>
   <div class="metrics">
@@ -143,6 +162,30 @@
         document.getElementById("ping").textContent = "Error";
       }
     }
+
+    // Fetch user's IPv4 and ISP separately
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("ip-address").textContent = `IPv4: ${data.ip}`;
+        document.getElementById("isp-name").textContent = `ISP: ${data.org}`;
+      })
+      .catch(() => {
+        document.getElementById("ip-address").textContent = "Could not fetch IPv4.";
+        document.getElementById("isp-name").textContent = "ISP info unavailable.";
+      });
+
+    // Fetch IPv6 only if available
+    fetch("https://api64.ipify.org?format=json")
+      .then(res => res.json())
+      .then(data => {
+        if (data.ip && data.ip.includes(":")) {
+          document.getElementById("ipv6-address").textContent = `IPv6: ${data.ip}`;
+        }
+      })
+      .catch(() => {
+        console.log("IPv6 not available.");
+      });
   </script>
 </body>
 </html>
